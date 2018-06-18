@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shellder</title>
+    <title>CChao</title>
 
     <!-- meta -->
     <meta charset="UTF-8">
@@ -31,7 +31,7 @@
         <div class="row">
             <div class="col-md-4 col-sm-5 col-xs-8">
                 <div class="logo">
-                    <h1><a href="{% url 'blog:index' %}">Shellder</a></h1>
+                    <h1><a href="{% url 'blog:index' %}">CChao</a></h1>
                 </div>
             </div><!-- col-md-4 -->
             <div class="col-md-8 col-sm-7 col-xs-4">
@@ -68,7 +68,7 @@
 <!-- <div class="copyrights">Collect from <a href="http://www.cssmoban.com/">网页模板</a></div> -->
 <!-- <div class="copyrights">Modified by <a href="http://zmrenwu.com/">追梦人物的博客</a></div> -->
 
-<div class="content-body">
+<div class="content-body" style="padding-top: 90px;">
     <div class="container">
         <div class="row">
             <main class="col-md-8">
@@ -106,20 +106,6 @@
                     </ul>
                 </div>
 
-                <div class="widget widget-category">
-                    <h3 class="widget-title">分类</h3>
-                    {% get_categories as category_list %}
-                    <ul>
-                        {% for category in category_list %}
-                            <li>
-                                <a href="{% url 'blog:categories' category.pk %}">{{ category.name }} <span class="post-count">({{ category.num_posts }})</span></a>
-                            </li>
-                        {% empty %}
-                            暂无分类！
-                        {% endfor %}
-                    </ul>
-                </div>
-
                 <div class="widget widget-tag-cloud">
                     <h3 class="widget-title">标签云</h3>
                     {% get_tags as tag_list %}
@@ -144,7 +130,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <p class="copyright">&copy 2017 - Shellder
+                <p class="copyright">&copy Blog based on <a href="https://github.com/luoshao23/blogproj">luoshao23/blogproj</a>.
                 </p>
             </div>
         </div>
