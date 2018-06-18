@@ -1,5 +1,4 @@
 # coding: utf-8
-from markdown2 import markdown
 from django.utils.html import strip_tags
 from django.db import models
 from django.contrib.auth.models import User
@@ -7,6 +6,9 @@ from django.urls import reverse
 from django.utils.six import python_2_unicode_compatible
 from django.core.files.base import ContentFile
 from taggit.managers import TaggableManager
+import markdown
+from markdown.extensions.toc import TocExtension
+from django.utils.text import slugify
 
 
 @python_2_unicode_compatible
@@ -15,6 +17,7 @@ class Post(models.Model):
     title = models.CharField(max_length=70)
     body = models.TextField()
     html_file = models.FileField(upload_to='source/%Y/', blank=True)
+    toc = models.TextField(blank=True)
 
     created_time = models.DateTimeField('date published', auto_now_add=True)
     modified_time = models.DateTimeField('date edited', auto_now_add=True)
@@ -42,17 +45,29 @@ class Post(models.Model):
     # overwrite models.save
     def save(self, *args, **kwargs):
         # TODO: add support to .rst .org .html
+        if not (self.html_file and self.excerpect and self.toc):
+            md = markdown.Markdown(extensions=[
+                'markdown.extensions.extra',
+                'markdown.extensions.codehilite',
+                TocExtension(slugify=slugify),
+            ])
+            html = md.convert(self.body)
+
         if not self.html_file:
-            html = markdown(self.body, extras=['fenced-code-blocks', 'tables'])
-            if not self.excerpect:
-                # TODO: header included
-                self.excerpect = strip_tags(html)[:100]
             self.html_file.save(self.title + '.html',
                                 ContentFile(html.encode('utf-8')), save=False)
             self.html_file.close()
+
+        if not self.excerpect:
+            # TODO: header included
+            self.excerpect = strip_tags(html)[:100]
+
+        if not self.toc:
+            self.toc = '\n'.join(filter(lambda x: x != '', md.toc.split('\n')))
+
         super().save(*args, **kwargs)
 
-    # delte html file when post deleted
+    # delete html file when post deleted
     def delete(self, *args, **kwargs):
         if self.html_file:
             self.html_file.delete(save=False)
