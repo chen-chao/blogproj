@@ -20,12 +20,12 @@ class Post(models.Model):
     toc = models.TextField(blank=True)
 
     created_time = models.DateTimeField('date published', auto_now_add=True)
-    modified_time = models.DateTimeField('date edited', auto_now_add=True)
+    modified_time = models.DateTimeField('last edited', auto_now=True)
 
     # 文章摘要
     excerpect = models.CharField(max_length=200, blank=True)
 
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     # keep posts when user deleted
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -45,7 +45,7 @@ class Post(models.Model):
     # overwrite models.save
     def save(self, *args, **kwargs):
         # TODO: add support to .rst .org .html
-        if not (self.html_file and self.excerpect and self.toc):
+        if not self.html_file:
             md = markdown.Markdown(extensions=[
                 'markdown.extensions.extra',
                 'markdown.extensions.codehilite',
@@ -53,16 +53,12 @@ class Post(models.Model):
             ])
             html = md.convert(self.body)
 
-        if not self.html_file:
             self.html_file.save(self.title + '.html',
                                 ContentFile(html.encode('utf-8')), save=False)
             self.html_file.close()
 
-        if not self.excerpect:
             # TODO: header included
             self.excerpect = strip_tags(html)[:100]
-
-        if not self.toc:
             self.toc = '\n'.join(filter(lambda x: x != '', md.toc.split('\n')))
 
         super().save(*args, **kwargs)
