@@ -1,13 +1,14 @@
 # coding: utf-8
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from taggit.models import Tag
 
 
-from .models import Post
+from .models import Post, PostImage
 from comments.forms import CommentForm
-
+import os.path
 
 global PAGE_NUM
 PAGE_NUM = 10
@@ -51,6 +52,20 @@ class IndexView(ListView):
         }
 
         return data
+
+
+def ImageView(request, imagename, pk=None):
+    imagename = 'images/' + imagename
+    if pk:
+        imageobj = Post.objects.get(pk=pk).images.get(image=imagename)
+    else:
+        imageobj = PostImage.objects.get(image=imagename)
+    if imageobj:
+        _, ext = os.path.splitext(os.path.basename(imageobj.image.path))
+        image_type = 'image/' + ext
+        with open(imageobj.image.path, 'rb') as im:
+            return HttpResponse(im.read(), content_type=image_type)
+    raise Http404('can not find %s' % imagename)
 
 
 class ArchiveView(IndexView):

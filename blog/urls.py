@@ -10,6 +10,8 @@ urlpatterns = [
     # path('archive/<int:year>/', views.ArchiveView.as_view(), name='archives'),
     path('archives/<int:year>/<int:month>/', views.ArchiveView.as_view(),
          name='archives'),
+    path('blog/images/<str:imagename>/', views.ImageView, name='image'),
+    path('blog/<int:pk>/<str:imagename>/', views.ImageView, name='image'),
     path('tags/<int:pk>/', views.TagView.as_view(), name='tags'),
     path('about/', views.AboutView.as_view(), name='about'),
     path('contact/', views.ContactView.as_view(), name='contact'),
