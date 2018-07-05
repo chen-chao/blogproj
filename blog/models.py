@@ -1,4 +1,5 @@
 # coding: utf-8
+import os.path
 from django.utils.html import strip_tags
 from django.db import models
 from django.contrib.auth.models import User
@@ -7,16 +8,69 @@ from django.utils.six import python_2_unicode_compatible
 from django.core.files.base import ContentFile
 from taggit.managers import TaggableManager
 import markdown
-from markdown.extensions.toc import TocExtension
-from django.utils.text import slugify
+import requests
+import json
+import lxml
+from lxml.html import tostring
+from datetime import datetime
+
+
+def _github_parse_markdown(text, mode='gfm', context=None):
+    payload = {'text': text, 'mode': mode}
+    if context:
+        payload['conext'] = context
+    resp = requests.post('https://api.github.com/markdown/',
+                         data=json.dumps(payload))
+    if resp.ok:
+        return resp.content.decode('utf-8')
+
+    raise TypeError('Cannot parse markdown file, status code {}'.format(
+        resp.status_code))
+
+
+def get_html_toc_excerpt(html: str, level=3, length=200):
+    tree = lxml.html.fromstring(html)
+    headings = '//h2'
+    for i in range(3, level+1):
+        headings += '|//h%d' % i
+
+    toc = '<ul> '
+    last_tag = 2
+    for heading in tree.xpath(headings):
+        current_tag = int(heading.tag[1:])
+        if current_tag > last_tag:
+            toc += '<ul>\n'
+        elif current_tag < last_tag:
+            toc += ' </ul>\n'
+        id_ = heading.attrib.get('id', '')
+        text = heading.text_content()
+        toc += '<li> <a href="#%s"> %s </a> </li>\n' % (id_, text)
+        last_tag = current_tag
+    toc += ' </ul>\n'
+
+    try:
+        h1 = tree.xpath('//h1')[0]
+        h1.drop_tree()
+    except IndexError:
+        pass
+
+    html_no_h1 = tostring(tree, encoding='unicode')
+    return toc, strip_tags(html_no_h1)[:length]
 
 
 @python_2_unicode_compatible
 class Post(models.Model):
     """Post"""
-    title = models.CharField(max_length=70)
-    body = models.TextField()
-    html_file = models.FileField(upload_to='source/%Y/', blank=True)
+
+    def get_upload_name(self, filename):
+        # created_time will be saved after the directly uploaded html file
+        year = (self.created_time.year if self.created_time
+                else datetime.now().year)
+        return os.path.join('source', str(year), self.title+'.html')
+
+    title = models.CharField(max_length=70, unique=True)
+    body = models.TextField(blank=True)
+    html_file = models.FileField(upload_to=get_upload_name, blank=True)
     toc = models.TextField(blank=True)
 
     created_time = models.DateTimeField('date published', auto_now_add=True)
@@ -44,22 +98,19 @@ class Post(models.Model):
 
     # overwrite models.save
     def save(self, *args, **kwargs):
-        # TODO: add support to .rst .org .html
-        if not self.html_file:
+        if self.body and not self.html_file:
             md = markdown.Markdown(extensions=[
                 'markdown.extensions.extra',
                 'markdown.extensions.codehilite',
-                TocExtension(slugify=slugify),
             ])
             html = md.convert(self.body)
 
             self.html_file.save(self.title + '.html',
                                 ContentFile(html.encode('utf-8')), save=False)
             self.html_file.close()
-
-            # TODO: header included
-            self.excerpect = strip_tags(html)[:100]
-            self.toc = '\n'.join(filter(lambda x: x != '', md.toc.split('\n')))
+        else:
+            html = self.display()
+        self.toc, self.excerpect = get_html_toc_excerpt(html)
 
         super().save(*args, **kwargs)
 
@@ -81,3 +132,6 @@ class PostImage(models.Model):
     post = models.ForeignKey(Post, related_name='images',
                              on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/')
+
+    def __str__(self):
+        return os.path.basename(self.image.path)
