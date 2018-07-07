@@ -3,12 +3,19 @@ from django import forms
 from django.forms import TextInput, Textarea
 from django.core.files.base import ContentFile
 from .models import Post, PostImage
+from comments.models import Comment
 # Register your models here.
 
 
 class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 3
+
+
+class CommentInline(admin.StackedInline):
+    model = Comment
+    extra = 1
+    exclude = ('url',)
 
 
 class PostAdminForm(forms.ModelForm):
@@ -24,13 +31,13 @@ class PostAdminForm(forms.ModelForm):
 
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
-    inlines = [PostImageInline]
+    inlines = [PostImageInline, CommentInline]
     list_display = ['title', 'author', 'created_time', 'modified_time', ]
     list_filter = ['created_time']
     search_fields = ['title', 'author']
 
     def save_model(self, request, obj, form, change):
-        if obj:
+        if obj and form.is_valid():
             if change and any(map(lambda x: x in form.changed_data,
                                   ('title', 'body', 'html_file'))):
                 obj.html_file.delete()
