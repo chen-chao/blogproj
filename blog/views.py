@@ -54,12 +54,9 @@ class IndexView(ListView):
         return data
 
 
-def ImageView(request, imagename, pk=None):
+def ImageView(request, imagename, pk):
     imagename = 'images/' + imagename
-    if pk:
-        imageobj = Post.objects.get(pk=pk).images.get(image=imagename)
-    else:
-        imageobj = PostImage.objects.get(image=imagename)
+    imageobj = Post.objects.get(pk=pk).images.get(image__contains=imagename)
     if imageobj:
         _, ext = os.path.splitext(os.path.basename(imageobj.image.path))
         image_type = 'image/' + ext
