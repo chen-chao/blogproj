@@ -32,13 +32,14 @@
     outline: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    margin-top: 0;
+h1, h2, h3, h4, h5, h6:not(article){
+    /* margin-top: 0; */
+    margin: 10px 0 10px;
+    padding: 0;
+    font-weight: bold;
+    -webkit-font-smoothing: antialiased;
+    cursor: text;
+    position: relative;
 }
 
 b {
@@ -63,11 +64,15 @@ body {
     font-family: 'Lato', sans-serif;
 }
 
-p {
+article p:not(.meta) {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 400;
     word-spacing: 1px;
     letter-spacing: 0.01em;
+    font-size: 16px;
+    line-height: 180%;
+    margin: 16px 0 16px 0;
+    padding: 0;
 }
 
 #single p,
@@ -230,7 +235,7 @@ img {
     text-align: center;
     color: #DDDDDD;
     font-size: 13px;
-    margin-bottom: 30px;
+    margin-bottom: 8px;
 }
 
 .entry-content {

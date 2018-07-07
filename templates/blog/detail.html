@@ -1,26 +1,16 @@
 {% extends 'base.html' %}
 {% block main %}
-                <article class="post post-{{ post.pk }}">
+                <article class="post">
                     <header class="entry-header">
-                        <h1 class="entry-title">{{ post.title }}</h1>
-                        <div class="entry-meta">
-                            <span class="post-date"><a href="{% url 'blog:archives' post.created_time.year post.created_time.month %}"><time class="entry-date"
-                                                                      datetime="{{ post.created_time }}">{{ post.created_time }}</time></a></span>
-                            <span class="post-author"><a href="#">{{ post.author }}</a></span>
-                            <span class="comments-link"><a href="#">{{ post.comment_set.count }} 评论</a></span>
-                            <span class="views-count"><a href="#">{{ post.count_read }} 阅读</a></span>
-                        </div>
+                        <p class="meta">
+                            <time created_time="{{ post.create_time }}" modified_time="{{ post.modified_time }}">
+                                {{ post.author|upper }}, {{ post.created_time|date:'M'|upper }}
+                                {{ post.created_time|date:"dS"|upper }}, {{post.created_time.year }}
+                            </time>
+                        </p>
                     </header>
                     <div class="entry-content clearfix">
                         {{ post.display|safe }}
-                        <div class="widget-tag-cloud">
-                            <ul>
-                                标签：
-                                {% for tag in post.tags.all %}
-                                    <li><a href="{% url 'blog:tags' tag.pk %}"># {{ tag.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
                     </div>
                 </article>
                 <section class="comment-area" id="comment-area">
@@ -76,3 +66,14 @@
                     {{ post.toc|safe }}
                 </div>
 {% endblock toc %}
+
+{% block tags %}
+                <div class="widget widget-tag-cloud">
+                    <h3 class="widget-title">标签云</h3>
+                    <ul>
+                        {% for tag in post.tags.all %}
+                        <li><a href="{% url 'blog:tags' tag.pk %}">{{ tag.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+{% endblock tags %}
