@@ -11,22 +11,41 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import platform
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# SECURITY settings
+DEBUG = True if platform.node() in ('KAGAMI', 'itumi') else False
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+if DEBUG:
+    SECRET_KEY = '8*sa0v9x@a9ye9d*96z&hkmeyg$t=oo8a2@t788rt_*k8i46w1'
+    ALLOWED_HOSTS = ['*']
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+    ALLOWED_HOSTS = os.environ['DJANGO_ALLOWED_HOSTS'].split(',')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    X_FRAME_OPTIONS = 'DENY'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8*sa0v9x@a9ye9d*96z&hkmeyg$t=oo8a2@t788rt_*k8i46w1'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [ '*',]
-
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['DJANGO_DB_NAME'],
+            'USER': os.environ['DJANGO_DB_USER'],
+            'PASSWORD': os.environ['DJANGO_DB_PASSWORD'],
+            'HOST': '',
+            'PORT': '',
+        }
+    }
 
 # Application definition
 
@@ -83,17 +102,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'blogproj.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
 
 # Password validation
