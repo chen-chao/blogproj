@@ -4,26 +4,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.six import python_2_unicode_compatible
-from django.core.files.base import ContentFile
 from taggit.managers import TaggableManager
-import markdown
-import requests
-import json
 import lxml.html
 from datetime import datetime
-
-
-def _github_parse_markdown(text, mode='gfm', context=None):
-    payload = {'text': text, 'mode': mode}
-    if context:
-        payload['conext'] = context
-    resp = requests.post('https://api.github.com/markdown/',
-                         data=json.dumps(payload))
-    if resp.ok:
-        return resp.content.decode('utf-8')
-
-    raise TypeError('Cannot parse markdown file, status code {}'.format(
-        resp.status_code))
 
 
 def get_html_toc(htmltree, level=3):
@@ -57,15 +40,8 @@ def get_html_excerpt(htmltree, length=200):
 class Post(models.Model):
     """Post"""
 
-    def get_upload_name(self, filename):
-        # created_time will be saved after the directly uploaded html file
-        year = (self.created_time.year if self.created_time
-                else datetime.now().year)
-        return os.path.join('source', str(year), self.title+'.html')
-
     title = models.CharField(max_length=70, unique=True)
-    body = models.TextField(blank=True)
-    html_file = models.FileField(upload_to=get_upload_name, blank=True)
+    html_file = models.FileField(upload_to='source/%Y/')
     toc = models.TextField(blank=True)
 
     created_time = models.DateTimeField('date published', auto_now_add=True)
@@ -93,19 +69,7 @@ class Post(models.Model):
 
     # overwrite models.save
     def save(self, *args, **kwargs):
-        if self.body and not self.html_file:
-            md = markdown.Markdown(extensions=[
-                'markdown.extensions.extra',
-                'markdown.extensions.codehilite',
-            ])
-            html = md.convert(self.body)
-
-            self.html_file.save(self.title + '.html',
-                                ContentFile(html.encode('utf-8')), save=False)
-            self.html_file.close()
-        else:
-            html = self.display()
-
+        html = self.display()
         tree = lxml.html.fromstring(html)
         self.toc = get_html_toc(tree)
         self.excerpect = get_html_excerpt(tree)
