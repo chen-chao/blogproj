@@ -7,9 +7,13 @@ whoosh_index/
 __pycache__/
 migrations/
 *.sqlite3
+media/
 # virtual environment
 bin/
 lib/
 include/
+share/
 pip-selfcheck.json
+# config files
+*.service
 *.conf
