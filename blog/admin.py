@@ -7,6 +7,7 @@ from comments.models import Comment
 import os.path
 import markdown
 import docutils.core
+import lxml.html
 
 
 class PostImageInline(admin.TabularInline):
@@ -59,6 +60,33 @@ def _original_file_to_html(f):
     return html
 
 
+def get_html_toc(htmltree, level=3):
+    headings = '//h2'
+    for i in range(3, level+1):
+        headings += '|//h%d' % i
+
+    toc = '<ul> '
+    last_tag = 2
+    for heading in htmltree.xpath(headings):
+        current_tag = int(heading.tag[1:])
+        if current_tag > last_tag:
+            toc += '<ul>\n'
+        elif current_tag < last_tag:
+            toc += ' </ul>\n'
+        id_ = heading.attrib.get('id', '')
+        text = heading.text_content()
+        toc += '<li> <a href="#%s"> %s </a> </li>\n' % (id_, text)
+        last_tag = current_tag
+    toc += ' </ul>\n'
+
+    return toc
+
+
+def get_html_excerpt(htmltree, length=200):
+    paragraph = htmltree.xpath('//p[1]')[0]
+    return paragraph.text_content().strip()[:length]
+
+
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
     inlines = [PostImageInline, CommentInline]
@@ -68,18 +96,22 @@ class PostAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if obj and form.is_valid():
-            if change and any(map(lambda x: x in form.changed_data,
-                                  ('title', 'original_file'))):
-                obj.html_file.delete(save=False)
-
+            toc = None
+            excerpt = None
             if 'original_file' in form.changed_data:
+                if obj.html_file:
+                    obj.html_file.delete(save=False)
                 f = request.FILES['original_file']
                 html = _original_file_to_html(f)
                 obj.html_file.save(obj.title+'.html', html, save=False)
                 obj.html_file.close()
+                html.seek(0)
+                htmltree = lxml.html.fromstring(html.read().decode('utf-8'))
+                toc = get_html_toc(htmltree)
+                excerpt = get_html_excerpt(htmltree)
                 f.close()
 
-            obj.save()
+            obj.save(toc, excerpt)
 
 
 admin.site.register(Post, PostAdmin)

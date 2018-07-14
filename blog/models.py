@@ -3,40 +3,9 @@ import os.path
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.utils.six import python_2_unicode_compatible
 from taggit.managers import TaggableManager
-import lxml.html
-from datetime import datetime
 
 
-def get_html_toc(htmltree, level=3):
-    headings = '//h2'
-    for i in range(3, level+1):
-        headings += '|//h%d' % i
-
-    toc = '<ul> '
-    last_tag = 2
-    for heading in htmltree.xpath(headings):
-        current_tag = int(heading.tag[1:])
-        if current_tag > last_tag:
-            toc += '<ul>\n'
-        elif current_tag < last_tag:
-            toc += ' </ul>\n'
-        id_ = heading.attrib.get('id', '')
-        text = heading.text_content()
-        toc += '<li> <a href="#%s"> %s </a> </li>\n' % (id_, text)
-        last_tag = current_tag
-    toc += ' </ul>\n'
-
-    return toc
-
-
-def get_html_excerpt(htmltree, length=200):
-    paragraph = htmltree.xpath('//p[1]')[0]
-    return paragraph.text_content().strip()[:length]
-
-
-@python_2_unicode_compatible
 class Post(models.Model):
     """Post"""
 
@@ -68,12 +37,11 @@ class Post(models.Model):
         self.save(update_fields=['count_read'])
 
     # overwrite models.save
-    def save(self, *args, **kwargs):
-        html = self.display()
-        tree = lxml.html.fromstring(html)
-        self.toc = get_html_toc(tree)
-        self.excerpect = get_html_excerpt(tree)
-
+    def save(self, toc=None, excerpt=None, *args, **kwargs):
+        if toc:
+            self.toc = toc
+        if excerpt:
+            self.excerpect = excerpt
         super().save(*args, **kwargs)
 
     # delete html file when post deleted
