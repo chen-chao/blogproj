@@ -24,17 +24,11 @@ class Post(models.Model):
     # keep posts when user deleted
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
-    count_read = models.PositiveIntegerField(default=0)
-
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('blog:detail', kwargs={'pk': self.pk})
-
-    def increase_views(self):
-        self.count_read += 1
-        self.save(update_fields=['count_read'])
 
     # overwrite models.save
     def save(self, toc=None, excerpt=None, *args, **kwargs):

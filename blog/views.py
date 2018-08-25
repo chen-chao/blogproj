@@ -4,9 +4,7 @@ from django.http import HttpResponse, Http404
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from taggit.models import Tag
-
-
-from .models import Post, PostImage
+from .models import Post
 from comments.forms import CommentForm
 import os.path
 
@@ -92,8 +90,6 @@ class PostDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
-        self.object.increase_views()
-
         return response
 
     def get_context_data(self, **kwargs):
