@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block main %}
     {% if error_msg %}
       <p>{{ error_msg }}</p>
@@ -12,10 +11,16 @@
                 <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
             </h1>
             <div class="entry-meta">
-                <span class="post-date"><a href="#"><time class="entry-date"
-                                                          datetime="{{ post.created_time }}">{{ post.created_time|date }}</time></a></span>
-                <span class="post-author"><a href="#">{{ post.author }}</a></span>
-                <span class="comments-link"><a href="#">{{ post.comment_set.count }} 评论</a></span>
+                <span class="post-date"><time class="entry-date"
+                                              datetime="{{ post.created_time }}">{{ post.created_time|date }}</time></span>
+		{% comment %}
+                <span class="post-author">{{ post.author }}</span>
+                <span class="comments-link">
+		  {% load disqus_tags%}
+		  <a href="{{ post.get_absolute_url }}#disqus_thread" data-disqus-identifier="{{ post.id }}">View Comments</a>
+		  {% disqus_num_replies %}
+		</span>
+		{% endcomment %}
             </div>
             </header>
             <div class="entry-content clearfix">
@@ -27,23 +32,6 @@
         <div class="no-post">"Temporily no post!"</div>
     {% endfor %}
 
-    <!-- <div class="pagination-simple">
-        <a href="#">上一页</a>
-        <span class="current">第 6 页 / 共 11 页</span>
-        <a href="#">下一页</a>
-    </div> -->
-
-   <!--  {% if is_paginated %}
-    <div class="pagination-simple">
-      {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
-      {% endif %}
-      <span class="current">第 {{ page_obj.number }} 页 / 共 {{ paginator.num_pages }} 页</span>
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">下一页</a>
-      {% endif %}
-    </div>
-    {% endif %} -->
     {% if is_paginated %}
     <div class="pagination">
       {% if left %}

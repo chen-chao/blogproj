@@ -52,17 +52,21 @@ else:
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
     'taggit',
+    'disqus',
     'comments',
     # 'haystack',
 ]
 
 TAGGIT_CASE_INSENSITIVE = True
+DISQUS_API_KEY = os.environ['DJANGO_DISQUS_KEY']
+DISQUS_WEBSITE_SHORTNAME = 'cchao'
 
 # HAYSTACK_CONNECTIONS = {
 #     'default': {

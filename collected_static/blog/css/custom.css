@@ -42,10 +42,6 @@ h1, h2, h3, h4, h5, h6:not(article){
     position: relative;
 }
 
-b {
-    font-weight: 400;
-}
-
 a {
     color: #333;
 }
@@ -220,7 +216,6 @@ img {
 
 .post {
     background: #fff;
-    padding: 30px 30px 0;
 }
 
 .entry-title {
@@ -233,7 +228,6 @@ img {
 
 .entry-meta {
     text-align: center;
-    color: #DDDDDD;
     font-size: 13px;
     margin-bottom: 8px;
 }
@@ -242,14 +236,6 @@ img {
     font-size: 18px;
     line-height: 1.9;
     font-weight: 300;
-    color: #000;
-}
-
-.post-category::after,
-.post-date::after,
-.post-author::after,
-.comments-link::after {
-    content: ' ·';
     color: #000;
 }
 
