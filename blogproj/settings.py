@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'blog',
     'taggit',
     'disqus',
-    'comments',
+    # 'comments',
     # 'haystack',
 ]
 

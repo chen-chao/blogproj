@@ -3,7 +3,6 @@ from django import forms
 from django.forms import TextInput
 from django.core.files.base import ContentFile
 from .models import Post, PostImage
-from comments.models import Comment
 import os.path
 import markdown
 import docutils.core
@@ -13,12 +12,6 @@ import lxml.html
 class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 3
-
-
-class CommentInline(admin.StackedInline):
-    model = Comment
-    extra = 1
-    exclude = ('url',)
 
 
 class PostAdminForm(forms.ModelForm):
@@ -89,7 +82,7 @@ def get_html_excerpt(htmltree, length=200):
 
 class PostAdmin(admin.ModelAdmin):
     form = PostAdminForm
-    inlines = [PostImageInline, CommentInline]
+    inlines = [PostImageInline,]
     list_display = ['title', 'author', 'created_time', 'modified_time', ]
     list_filter = ['created_time']
     search_fields = ['title', 'author']

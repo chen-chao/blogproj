@@ -5,7 +5,6 @@ from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from taggit.models import Tag
 from .models import Post
-from comments.forms import CommentForm
 import os.path
 
 global PAGE_NUM
@@ -87,21 +86,6 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/detail.html'
     context_object_name = 'post'
-
-    def get(self, request, *args, **kwargs):
-        response = super(PostDetailView, self).get(request, *args, **kwargs)
-        return response
-
-    def get_context_data(self, **kwargs):
-
-        context = super(PostDetailView, self).get_context_data(**kwargs)
-        form = CommentForm()
-        comment_list = self.object.comment_set.all()
-        context.update({
-            'form': form,
-            'comment_list': comment_list
-        })
-        return context
 
 
 def search(request):
