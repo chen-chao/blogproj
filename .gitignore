@@ -5,9 +5,13 @@
 *.egg-info
 whoosh_index/
 __pycache__/
+
+#django
 migrations/
 *.sqlite3
 media/
+collected_static
+
 # virtual environment
 bin/
 lib/
