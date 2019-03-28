@@ -68,16 +68,16 @@ TAGGIT_CASE_INSENSITIVE = True
 DISQUS_API_KEY = os.environ['DJANGO_DISQUS_KEY']
 DISQUS_WEBSITE_SHORTNAME = 'cchao'
 
-# Site for django-disqus
+# # Site for django-disqus
 
-from django.contrib.sites.model import Site
-name, domain = ('localhost', 'localhost:8080') if DEBUG else ('cchao.me', 'cchao.me')
-for site in Site.objects.all():
-    if site.name == name and site.domain == domain:
-        break
-else:
-    site = Site(name=name, domain=domain)
-    site.save()
+# from django.contrib.sites.models import Site
+# name, domain = ('localhost', 'localhost:8080') if DEBUG else ('cchao.me', 'cchao.me')
+# for site in Site.objects.all():
+#     if site.name == name and site.domain == domain:
+#         break
+# else:
+#     site = Site(name=name, domain=domain)
+#     site.save()
 
 # HAYSTACK_CONNECTIONS = {
 #     'default': {

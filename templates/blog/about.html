@@ -2,5 +2,62 @@
 
 
 {% block main %}
-    about
+{% if error_msg %}
+<p> {{error_msg}} </p>
+{% endif %}
+<article class="post">
+<div class="entry-content clearfix">
+<p>
+你好, 欢迎光临我的小站. 我会在这里分享自己的知识和思考. 如果有什么有趣
+的事情, 你可以通过<a href="mailto:wenbushi@gmail.com">邮件</a>, <a href="https://github.com/chen-chao">Github</a>或者<a href="https://www.zhihu.com/people/qibusheng">知乎</a>找到我.
+</p>
+
+<div id="outline-container-org709e082" class="outline-2">
+<h2 id="org709e082">编程</h2>
+<div class="outline-text-2" id="text-org709e082">
+<p>
+我热爱编程, 用字符创作的过程令我激动不已. 正在不断学习中, 也正在尝试
+找到第一份编程工作. 如果你愿意提供一个机会, 我会非常感激.
+</p>
+
+<p>
+可以在Github上看到我的一些尝试:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/chen-chao/blogproj">blogproj</a>, 我的这个博客网站.</li>
+<li><a href="https://github.com/chen-chao/training/tree/master/algorithms-part2/1.wordnet">wordnet</a>, <a href="https://www.coursera.org/learn/algorithms-part2/">Algorithms</a>的课程作业, 一个近义词网络.</li>
+<li><a href="https://github.com/chen-chao/training/tree/master/algorithms-part2/2.seam">seam</a>, 同样是<a href="https://www.coursera.org/learn/algorithms-part2/">Algorithms</a>的课程作业, 一个保持图片比例的缩放算法.</li>
+</ul>
+
+<p>
+我最爱的语言是Python, 当然我也可以用C, JAVA来编写程序. 你可能已经从这
+个博客里发现了, 我是一名Emacs用户. 欢迎对我的<a href="https://github.com/chen-chao/.emacs.d">配置文件</a>评头论足. Emacs实
+在太有趣了, 现在正沉迷其中无法自拔.
+</p>
+
+<p>
+因为专业的缘故, 我也在作一些有限元方面的计算, 希望能有更深地理解并做出
+小小的改进.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org4182b78" class="outline-2">
+<h2 id="org4182b78">番剧</h2>
+<div class="outline-text-2" id="text-org4182b78">
+<p>
+我喜欢番剧, <del>尤其是日常风格的美少女动画</del> 最爱的是幸运星. 同时也很喜欢轻
+音少女, 命运石之门, 日常和其他很多. 目前正在断断续续地学习日语.
+</p>
+
+<p>
+顺便说, 我最爱的电视剧是 <i>Yes, minister</i>.
+</p>
+</div>
+</div>
+
+</div>
+</article>
 {% endblock main %}
