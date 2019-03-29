@@ -102,13 +102,6 @@ def search(request):
                                                'post_list': post_list})
 
 
-class BlogView(ListView):
-    model = Post
-    template_name = 'blog/blog.html'
-    context_object_name = 'post_list'
-    paginate_by = PAGE_NUM
-
-
 class AboutView(ListView):
     model = Post
     template_name = 'blog/about.html'
